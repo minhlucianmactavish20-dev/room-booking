@@ -1,0 +1,14 @@
+from functools import wraps
+
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+
+
+def approver_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if not request.user.profile.is_approver:
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return wrapper

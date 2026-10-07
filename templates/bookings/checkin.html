@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Check-in{% endblock %}
+{% block content %}
+<h2>Check-in đặt phòng</h2>
+<table border="1" cellpadding="6">
+    <tr><th>Phòng</th><td>{{ booking.room.name }}</td></tr>
+    <tr><th>Người đặt</th><td>{{ booking.user.first_name|default:booking.user.username }}</td></tr>
+    <tr><th>Mục đích</th><td>{{ booking.purpose }}</td></tr>
+    <tr><th>Bắt đầu</th><td>{{ booking.start_time|date:"d/m/Y H:i" }}</td></tr>
+    <tr><th>Kết thúc</th><td>{{ booking.end_time|date:"d/m/Y H:i" }}</td></tr>
+    <tr><th>Trạng thái</th><td>{{ booking.get_status_display }}</td></tr>
+    <tr>
+        <th>Check-in</th>
+        <td>
+            {% if booking.checked_in_at %}
+                Đã check-in lúc {{ booking.checked_in_at|date:"d/m/Y H:i" }}
+            {% else %}
+                Chưa check-in
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+{% if can_check_in %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Xác nhận check-in</button>
+</form>
+{% elif not booking.checked_in_at %}
+<p>Chưa thể check-in: lượt đặt chưa được duyệt, hoặc chưa tới giờ (cho phép sớm {{ early_minutes }} phút), hoặc đã quá giờ.</p>
+{% endif %}
+
+<p><a href="{% url 'approval_list' %}">Quay lại trang duyệt</a></p>
+{% endblock %}

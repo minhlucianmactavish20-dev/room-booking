@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Báo cáo sử dụng phòng{% endblock %}
+{% block content %}
+<h2>Báo cáo tỉ lệ sử dụng phòng</h2>
+
+<form method="get">
+    Từ ngày: <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
+    Đến ngày: <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
+    <button type="submit">Xem báo cáo</button>
+</form>
+
+<p>
+    Khoảng thời gian: {{ date_from|date:"d/m/Y" }} - {{ date_to|date:"d/m/Y" }} ({{ num_days }} ngày).<br>
+    Khung giờ hoạt động: {{ open_hour }}:00 - {{ close_hour }}:00 mỗi ngày, mỗi phòng có tối đa {{ available_hours }} giờ.<br>
+    <strong>Tỉ lệ sử dụng chung: {{ overall_rate }}%</strong> (tổng {{ total_hours }} giờ đã đặt).
+</p>
+
+{% if rows %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Phòng</th>
+        <th>Tổng lượt</th>
+        <th>Đã duyệt</th>
+        <th>Chờ duyệt</th>
+        <th>Từ chối</th>
+        <th>Đã hủy</th>
+        <th>Đã check-in</th>
+        <th>Vắng mặt</th>
+        <th>Giờ đã đặt</th>
+        <th>Tỉ lệ sử dụng</th>
+    </tr>
+    {% for r in rows %}
+    <tr>
+        <td>{{ r.room.name }}</td>
+        <td>{{ r.total }}</td>
+        <td>{{ r.approved }}</td>
+        <td>{{ r.pending }}</td>
+        <td>{{ r.rejected }}</td>
+        <td>{{ r.cancelled }}</td>
+        <td>{{ r.checked_in }}</td>
+        <td>{{ r.no_show }}</td>
+        <td>{{ r.hours }} / {{ available_hours }}</td>
+        <td>
+            {{ r.rate }}%<br>
+            <progress value="{{ r.rate }}" max="100"></progress>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<p><small>Giờ đã đặt chỉ tính các lượt <strong>Đã duyệt</strong>. Vắng mặt là lượt đã duyệt, đã qua giờ kết thúc mà không check-in.</small></p>
+{% else %}
+<p>Chưa có phòng nào đang hoạt động.</p>
+{% endif %}
+{% endblock %}

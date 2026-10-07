@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Trang chủ{% endblock %}
+{% block content %}
+<h2>Lịch đặt phòng của tôi</h2>
+{% if bookings %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Phòng</th><th>Mục đích</th><th>Bắt đầu</th><th>Kết thúc</th><th>Trạng thái</th><th></th>
+    </tr>
+    {% for b in bookings %}
+    <tr>
+        <td>{{ b.room.name }}</td>
+        <td>{{ b.purpose }}</td>
+        <td>{{ b.start_time|date:"d/m/Y H:i" }}</td>
+        <td>{{ b.end_time|date:"d/m/Y H:i" }}</td>
+        <td>
+            {{ b.get_status_display }}
+            {% if b.status == "rejected" and b.reject_reason %}
+                <br><small>Lý do: {{ b.reject_reason }}</small>
+            {% endif %}
+            {% if b.checked_in_at %}
+                <br><small>Đã check-in {{ b.checked_in_at|date:"H:i d/m" }}</small>
+            {% endif %}
+        </td>
+        <td>
+            {% if b.status == "approved" %}
+                <a href="{% url 'booking_qr' b.pk %}">Xem mã QR</a>
+            {% endif %}
+            {% if b.status == "pending" or b.status == "approved" %}
+            <form method="post" action="{% url 'booking_cancel' b.pk %}">
+                {% csrf_token %}
+                <button type="submit">Hủy</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Bạn chưa có lượt đặt phòng nào.</p>
+{% endif %}
+<p><a href="{% url 'booking_create' %}">+ Đặt phòng mới</a></p>
+
+<h2>Hàng chờ của tôi</h2>
+{% if waitlist %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Phòng</th><th>Mục đích</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tình trạng</th><th></th>
+    </tr>
+    {% for w in waitlist %}
+    <tr>
+        <td>{{ w.room.name }}</td>
+        <td>{{ w.purpose }}</td>
+        <td>{{ w.start_time|date:"d/m/Y H:i" }}</td>
+        <td>{{ w.end_time|date:"d/m/Y H:i" }}</td>
+        <td>
+            {% if w.available %}
+                <strong>Phòng đã trống!</strong>
+                <a href="{% url 'booking_create' %}?room={{ w.room.pk }}&purpose={{ w.purpose|urlencode }}&start_time={{ w.start_time|date:'Y-m-d\TH:i' }}&end_time={{ w.end_time|date:'Y-m-d\TH:i' }}">Đặt ngay</a>
+            {% else %}
+                Đang chờ
+            {% endif %}
+        </td>
+        <td>
+            <form method="post" action="{% url 'waitlist_leave' w.pk %}">
+                {% csrf_token %}
+                <button type="submit">Rời hàng chờ</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Bạn không có trong hàng chờ nào.</p>
+{% endif %}
+{% endblock %}

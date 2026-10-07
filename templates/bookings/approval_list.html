@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Duyệt đặt phòng{% endblock %}
+{% block content %}
+<h2>Các yêu cầu đặt phòng chờ duyệt</h2>
+{% if bookings %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Phòng</th><th>Người đặt</th><th>Mục đích</th>
+        <th>Bắt đầu</th><th>Kết thúc</th><th>Thao tác</th>
+    </tr>
+    {% for b in bookings %}
+    <tr>
+        <td>{{ b.room.name }}</td>
+        <td>{{ b.user.first_name|default:b.user.username }}</td>
+        <td>{{ b.purpose }}</td>
+        <td>{{ b.start_time|date:"d/m/Y H:i" }}</td>
+        <td>{{ b.end_time|date:"d/m/Y H:i" }}</td>
+        <td>
+            <form method="post" action="{% url 'booking_approve' b.pk %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit">Duyệt</button>
+            </form>
+            <form method="post" action="{% url 'booking_reject' b.pk %}" style="display:inline">
+                {% csrf_token %}
+                <input type="text" name="reason" placeholder="Lý do từ chối" required>
+                <button type="submit">Từ chối</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Không có yêu cầu nào đang chờ duyệt.</p>
+{% endif %}
+{% endblock %}

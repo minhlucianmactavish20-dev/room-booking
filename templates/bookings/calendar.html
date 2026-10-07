@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Lịch {{ room.name }}{% endblock %}
+{% block content %}
+<h2>Lịch tuần: {{ room.name }}</h2>
+
+<p>
+    <a href="?week={{ prev_week|date:'Y-m-d' }}">&laquo; Tuần trước</a> |
+    <a href="?week={{ this_week|date:'Y-m-d' }}">Tuần này</a> |
+    <a href="?week={{ next_week|date:'Y-m-d' }}">Tuần sau &raquo;</a>
+</p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Giờ</th>
+        {% for d in days %}
+        <th>{{ d|date:"D d/m" }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in rows %}
+    <tr>
+        <th>{{ row.label }}</th>
+        {% for cell in row.cells %}
+        <td>
+            {% if cell %}
+                <strong>{{ cell.get_status_display }}</strong><br>
+                {{ cell.user.first_name|default:cell.user.username }}<br>
+                <small>{{ cell.start_time|time:"H:i" }}-{{ cell.end_time|time:"H:i" }}</small>
+            {% endif %}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+<p>
+    <a href="{% url 'booking_create' %}?room={{ room.pk }}">Đặt phòng này</a> |
+    <a href="{% url 'room_list' %}">Quay lại danh sách phòng</a>
+</p>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Đặt phòng{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            Xin chào, {{ user.first_name|default:user.username }} |
+            <a href="{% url 'dashboard' %}">Trang chủ</a> |
+            <a href="{% url 'room_list' %}">Danh sách phòng</a> |
+            <a href="{% url 'booking_create' %}">Đặt phòng</a> |
+            {% if user.profile.is_approver %}
+                <a href="{% url 'approval_list' %}">Duyệt phòng</a> |
+                <a href="{% url 'report' %}">Báo cáo</a> |
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit">Đăng xuất</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Đăng nhập</a> |
+            <a href="{% url 'register' %}">Đăng ký</a>
+        {% endif %}
+    </nav>
+    <hr>
+    {% if messages %}
+        {% for message in messages %}
+            <p><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</body>
+</html>

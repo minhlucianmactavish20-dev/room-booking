@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Danh sách phòng{% endblock %}
+{% block content %}
+<h2>Danh sách phòng</h2>
+{% if rooms %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Tên phòng</th><th>Loại</th><th>Vị trí</th><th>Sức chứa</th><th>Thiết bị</th><th></th>
+    </tr>
+    {% for r in rooms %}
+    <tr>
+        <td>{{ r.name }}</td>
+        <td>{{ r.get_room_type_display }}</td>
+        <td>{{ r.location }}</td>
+        <td>{{ r.capacity }}</td>
+        <td>{{ r.equipment }}</td>
+        <td>
+            <a href="{% url 'room_calendar' r.pk %}">Xem lịch</a> |
+            <a href="{% url 'booking_create' %}?room={{ r.pk }}">Đặt phòng này</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Chưa có phòng nào. Admin hãy thêm phòng ở trang quản trị.</p>
+{% endif %}
+{% endblock %}
